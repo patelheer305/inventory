@@ -5,6 +5,24 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>માર્શલ ઇન્વેન્ટરી સિસ્ટમ</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    (function() {
+      const PASSWORD = "Jaiho"; // Set your password
+      let attempts = 0;
+      let pass = prompt("કૃપા કરીને પાસવર્ડ દાખલ કરો:");
+
+      while(pass !== PASSWORD && attempts < 10){
+        pass = prompt("પાસવર્ડ ખોટો. ફરીથી દાખલ કરો:");
+        attempts++;
+      }
+
+      if(pass !== PASSWORD){
+        document.write("<div class='flex justify-center items-center h-screen'><h2 class='text-red-600 text-2xl'>પાસવર્ડ ખોટો. ઍક્સેસ નિષિદ્ધ.</h2></div>");
+        document.close();
+        throw "Access Denied";
+      }
+    })();
+  </script>
 </head>
 <body class="bg-gray-100 p-4 sm:p-6">
   <div class="max-w-3xl mx-auto bg-white p-4 sm:p-6 rounded-lg shadow-md">
@@ -145,6 +163,7 @@
   </script>
 </body>
 </html>
+
 
 
 
