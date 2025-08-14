@@ -6,23 +6,31 @@
   <title>માર્શલ ઇન્વેન્ટરી સિસ્ટમ</title>
   <script src="https://cdn.tailwindcss.com"></script>
 <script>
-    (function() {
-      const PASSWORD = "Jaiho"; // Set your password
-      let attempts = 0;
-      let pass = prompt("કૃપા કરીને પાસવર્ડ દાખલ કરો:");
+  const PASSWORD = "mySecret123"; // Set your password here
 
-      while(pass !== PASSWORD && attempts < 2){
-        pass = prompt("પાસવર્ડ ખોટો. ફરીથી દાખલ કરો:");
-        attempts++;
-      }
+  // Hide the app by default
+  document.addEventListener("DOMContentLoaded", () => {
+    const app = document.getElementById("app");
+    app.style.display = "none";
 
-      if(pass !== PASSWORD){
-        document.write("<div class='flex justify-center items-center h-screen'><h2 class='text-red-600 text-2xl'>પાસવર્ડ ખોટો. ઍક્સેસ નિષિદ્ધ.</h2></div>");
-        document.close();
-        throw "Access Denied";
-      }
-    })();
-  </script>
+    let attempts = 0;
+    let pass = prompt("કૃપા કરીને પાસવર્ડ દાખલ કરો:");
+
+    while (pass !== PASSWORD && attempts < 2) {
+      pass = prompt("પાસવર્ડ ખોટો. ફરીથી દાખલ કરો:");
+      attempts++;
+    }
+
+    if (pass === PASSWORD) {
+      app.style.display = "block"; // Show app
+    } else {
+      const body = document.body;
+      body.innerHTML = `<div class='flex justify-center items-center h-screen'>
+        <h2 class='text-red-600 text-2xl'>પાસવર્ડ ખોટો. ઍક્સેસ નિષિદ્ધ.</h2>
+      </div>`;
+    }
+  });
+</script>
 </head>
 <body class="bg-gray-100 p-4 sm:p-6">
   <div class="max-w-3xl mx-auto bg-white p-4 sm:p-6 rounded-lg shadow-md">
@@ -163,6 +171,7 @@
   </script>
 </body>
 </html>
+
 
 
 
