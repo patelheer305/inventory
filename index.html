@@ -5,32 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>માર્શલ ઇન્વેન્ટરી સિસ્ટમ</title>
   <script src="https://cdn.tailwindcss.com"></script>
-<script>
-  const PASSWORD = "Jaiho"; // Set your password here
-
-  // Hide the app by default
-  document.addEventListener("DOMContentLoaded", () => {
-    const app = document.getElementById("app");
-    app.style.display = "none";
-
-    let attempts = 0;
-    let pass = prompt("કૃપા કરીને પાસવર્ડ દાખલ કરો:");
-
-    while (pass !== PASSWORD && attempts < 2) {
-      pass = prompt("પાસવર્ડ ખોટો. ફરીથી દાખલ કરો:");
-      attempts++;
-    }
-
-    if (pass === PASSWORD) {
-      app.style.display = "block"; // Show app
-    } else {
-      const body = document.body;
-      body.innerHTML = `<div class='flex justify-center items-center h-screen'>
-        <h2 class='text-red-600 text-2xl'>પાસવર્ડ ખોટો. ઍક્સેસ નિષિદ્ધ.</h2>
-      </div>`;
-    }
-  });
-</script>
 </head>
 <body class="bg-gray-100 p-4 sm:p-6">
   <div class="max-w-3xl mx-auto bg-white p-4 sm:p-6 rounded-lg shadow-md">
@@ -41,7 +15,7 @@
     <!-- Tabs -->
     <div class="flex justify-center border-b mb-4">
       <button id="manageTab" onclick="showTab('manage')" class="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold text-blue-600 border-b-2 border-blue-600 mx-1">ઇન્વેન્ટરી વ્યવસ્થાપન</button>
-      <button id="levelsTab" onclick="showTab('levels')" class="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold text-gray-600 mx-1">ઇન્વેન્ટરી સ્તરો</button>
+      <button id="levelsTab" onclick="showTab('levels')" class="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold text-blue-600 mx-1">ઇન્વેન્ટરી સ્તરો</button>
     </div>
 
     <!-- Manage Tab -->
@@ -171,6 +145,7 @@
   </script>
 </body>
 </html>
+
 
 
 
