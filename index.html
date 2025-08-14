@@ -58,7 +58,7 @@
     <div id="levels" class="hidden">
       <input id="searchItem" type="text" placeholder="વસ્તુનું નામ શોધો" class="border p-2 mb-2 w-full text-sm sm:text-base" oninput="renderInventoryList()">
       <select id="filterCategory" class="border p-2 mb-2 w-full text-sm sm:text-base" onchange="renderInventoryList()">
-        <option value="">બધી શ્રેણીઓ</option>
+        <!-- Categories will be populated dynamically -->
       </select>
       <ul id="inventoryList" class="list-disc pl-5 mb-4 text-sm sm:text-base"></ul>
       <h3 class="font-semibold text-sm sm:text-base">નીચા ઇન્વેન્ટરી (≤ 5)</h3>
@@ -101,6 +101,7 @@
         inventory = await invRes.json();
 
         populateSelections();
+        populateFilterCategories(); // <-- populate levels tab dropdown
         renderInventoryList();
         renderLowInventory();
         setStatus('ડેટા લોડ થઈ ગયો.');
@@ -122,6 +123,12 @@
         items.filter(i=>i.category===cat).forEach(i=>sel.add(new Option(i.name, i.name)));
         sel.disabled=false;
       };
+    }
+
+    function populateFilterCategories() {
+      const filter = document.getElementById('filterCategory');
+      filter.innerHTML = '<option value="">બધી શ્રેણીઓ</option>';
+      categories.forEach(c => filter.add(new Option(c, c)));
     }
 
     async function changeQty(mode){
@@ -163,7 +170,6 @@
   </script>
 </body>
 </html>
-
 
 
 
