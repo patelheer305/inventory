@@ -30,11 +30,37 @@
     <!-- Title -->
     <h1 class="text-xl sm:text-2xl font-bold text-center mb-4">માર્શલ ઇન્વેન્ટરી સિસ્ટમ</h1>
 
-    <!-- Tabs -->
-    <div class="flex justify-center border-b mb-4">
-      <button id="manageTab" onclick="showTab('manage')" class="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold text-blue-600 border-b-2 border-blue-600 mx-1">ઇન્વેન્ટરી વ્યવસ્થાપન</button>
-      <button id="levelsTab" onclick="showTab('levels')" class="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold text-blue-600 mx-1">ઇન્વેન્ટરી સ્તરો</button>
-    </div>
+<!-- Tabs -->
+<div class="flex justify-center border-b mb-4">
+  <button id="manageTab" onclick="showTab('manage')" class="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold text-blue-600 border-b-2 border-blue-600 mx-1">ઇન્વેન્ટરી વ્યવસ્થાપન</button>
+  <button id="levelsTab" onclick="showTab('levels')" class="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold text-black border-b-2 border-transparent mx-1">ઇન્વેન્ટરી સ્તરો</button>
+</div>
+
+<script>
+function showTab(tab){
+  const manageTab = document.getElementById('manageTab');
+  const levelsTab = document.getElementById('levelsTab');
+
+  document.getElementById('manage').classList.toggle('hidden', tab!=='manage');
+  document.getElementById('levels').classList.toggle('hidden', tab!=='levels');
+
+  if(tab==='manage'){
+    manageTab.classList.add('text-blue-600','border-blue-600');
+    manageTab.classList.remove('text-black','border-transparent');
+
+    levelsTab.classList.add('text-black','border-transparent');
+    levelsTab.classList.remove('text-blue-600','border-blue-600');
+  } else {
+    levelsTab.classList.add('text-blue-600','border-blue-600');
+    levelsTab.classList.remove('text-black','border-transparent');
+
+    manageTab.classList.add('text-black','border-transparent');
+    manageTab.classList.remove('text-blue-600','border-blue-600');
+  }
+
+  if(tab==='levels'){ renderInventoryList(); renderLowInventory(); }
+}
+</script>
 
     <!-- Manage Tab -->
     <div id="manage">
@@ -179,5 +205,6 @@
   </script>
 </body>
 </html>
+
 
 
