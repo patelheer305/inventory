@@ -7,11 +7,17 @@
   <script src="https://cdn.tailwindcss.com"></script>
 <script>
     (function() {
-      const PASSWORD = "jaihomarshal"; // set your password here
-      const userInput = prompt("કૃપા કરીને પાસવર્ડ દાખલ કરો:");
-      if(userInput !== PASSWORD){
-        document.open();
-        document.write("<h2 class='text-center mt-20 text-red-600 text-xl'>પાસવર્ડ ખોટો. ઍક્સેસ નિષિદ્ધ.</h2>");
+      const PASSWORD = "Jaiho"; // Set your password
+      let attempts = 0;
+      let pass = prompt("કૃપા કરીને પાસવર્ડ દાખલ કરો:");
+
+      while(pass !== PASSWORD && attempts < 2){
+        pass = prompt("પાસવર્ડ ખોટો. ફરીથી દાખલ કરો:");
+        attempts++;
+      }
+
+      if(pass !== PASSWORD){
+        document.write("<div class='flex justify-center items-center h-screen'><h2 class='text-red-600 text-2xl'>પાસવર્ડ ખોટો. ઍક્સેસ નિષિદ્ધ.</h2></div>");
         document.close();
         throw "Access Denied";
       }
@@ -157,5 +163,6 @@
   </script>
 </body>
 </html>
+
 
 
