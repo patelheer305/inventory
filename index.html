@@ -56,10 +56,8 @@
 
     <!-- Levels Tab -->
     <div id="levels" class="hidden">
-      <input id="searchItem" type="text" placeholder="વસ્તુનું નામ શોધો" class="border p-2 mb-2 w-full text-sm sm:text-base" oninput="renderInventoryList()">
-      <select id="filterCategory" class="border p-2 mb-2 w-full text-sm sm:text-base" onchange="renderInventoryList()">
-        <!-- Categories will be populated dynamically -->
-      </select>
+      <input id="searchItem" type="text" placeholder="વસ્તુનું નામ શોધો" class="border p-2 mb-2 w-full text-sm sm:text-base" oninput="renderInventoryList(); renderLowInventory();">
+      <select id="filterCategory" class="border p-2 mb-2 w-full text-sm sm:text-base"></select>
       <ul id="inventoryList" class="list-disc pl-5 mb-4 text-sm sm:text-base"></ul>
       <h3 class="font-semibold text-sm sm:text-base">નીચા ઇન્વેન્ટરી (≤ 5)</h3>
       <ul id="lowInventoryList" class="list-disc pl-5 text-sm sm:text-base"></ul>
@@ -101,7 +99,7 @@
         inventory = await invRes.json();
 
         populateSelections();
-        populateFilterCategories(); // <-- populate levels tab dropdown
+        populateFilterCategories();
         renderInventoryList();
         renderLowInventory();
         setStatus('ડેટા લોડ થઈ ગયો.');
@@ -115,7 +113,7 @@
       const csel = document.getElementById('categorySelect');
       csel.innerHTML = '<option value="">શ્રેણી પસંદ કરો</option>';
       categories.forEach(c => csel.add(new Option(c, c)));
-      csel.onchange = ()=>{
+      csel.onchange = ()=> {
         const sel = document.getElementById('itemSelect');
         sel.innerHTML = '';
         const cat = csel.value;
@@ -129,6 +127,8 @@
       const filter = document.getElementById('filterCategory');
       filter.innerHTML = '<option value="">બધી શ્રેણીઓ</option>';
       categories.forEach(c => filter.add(new Option(c, c)));
+      // Re-render lists on category change
+      filter.onchange = () => { renderInventoryList(); renderLowInventory(); };
     }
 
     async function changeQty(mode){
@@ -152,27 +152,30 @@
       const ul = document.getElementById('inventoryList');
       ul.innerHTML='';
       inventory
-        .filter(r=>(!filter||r.category===filter)&&(!search||r.item.toLowerCase().includes(search)))
+        .filter(r => (!filter || r.category === filter) && (!search || r.item.toLowerCase().includes(search)))
         .sort((a,b)=>a.quantity-b.quantity)
-        .forEach(r=>{ const li=document.createElement('li'); li.textContent=`${r.category} - ${r.item}: ${r.quantity}`; ul.append(li); });
+        .forEach(r=>{
+          const li=document.createElement('li');
+          li.textContent=`${r.category} - ${r.item}: ${r.quantity}`;
+          ul.append(li);
+        });
     }
 
     function renderLowInventory(){
       const ul=document.getElementById('lowInventoryList');
+      const filter = document.getElementById('filterCategory').value;
       ul.innerHTML='';
       inventory
-        .filter(r=>r.quantity<=LOW_THRESHOLD)
+        .filter(r => r.quantity <= LOW_THRESHOLD && (!filter || r.category === filter))
         .sort((a,b)=>a.quantity-b.quantity)
-        .forEach(r=>{ const li=document.createElement('li'); li.textContent=`${r.category} - ${r.item}: ${r.quantity}`; ul.append(li); });
+        .forEach(r=>{
+          const li=document.createElement('li');
+          li.textContent=`${r.category} - ${r.item}: ${r.quantity}`;
+          ul.append(li);
+        });
     }
 
     window.onload=loadAll;
   </script>
 </body>
 </html>
-
-
-
-
-
-
