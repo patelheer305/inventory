@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>માર્શલ ઇન્વેન્ટરી સિસ્ટમ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    (function() {
+      const PASSWORD = "Jaiho"; // Set your password
+      let attempts = 0;
+      let pass = prompt("કૃપા કરીને પાસવર્ડ દાખલ કરો:");
+
+      while(pass !== PASSWORD && attempts < 10){
+        pass = prompt("પાસવર્ડ ખોટો. ફરીથી દાખલ કરો:");
+        attempts++;
+      }
+
+      if(pass !== PASSWORD){
+        document.write("<div class='flex justify-center items-center h-screen'><h2 class='text-red-600 text-2xl'>પાસવર્ડ ખોટો. ઍક્સેસ નિષિદ્ધ.</h2></div>");
+        document.close();
+        throw "Access Denied";
+      }
+    })();
+  </script>
+</head>
+<body class="bg-gray-100 p-4 sm:p-6">
+  <div class="max-w-3xl mx-auto bg-white p-4 sm:p-6 rounded-lg shadow-md">
+
+    <!-- Title -->
+    <h1 class="text-xl sm:text-2xl font-bold text-center mb-4">માર્શલ ઇન્વેન્ટરી સિસ્ટમ</h1>
+
+<!-- Tabs -->
+<div class="flex justify-center border-b mb-4">
+  <button id="manageTab" onclick="showTab('manage')" class="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold text-blue-600 border-b-2 border-blue-600 mx-1">ઇન્વેન્ટરી વ્યવસ્થાપન</button>
+  <button id="levelsTab" onclick="showTab('levels')" class="px-3 py-2 sm:px-4 sm:py-2 text-sm sm:text-base font-semibold text-black border-b-2 border-trasnparent mx-1">ઇન્વેન્ટરી સ્તરો</button>
+</div>
+
+<script>
+function showTab(tab){
+  const manageTab = document.getElementById('manageTab');
+  const levelsTab = document.getElementById('levelsTab');
+
+  document.getElementById('manage').classList.toggle('hidden', tab!=='manage');
+  document.getElementById('levels').classList.toggle('hidden', tab!=='levels');
+
+  if(tab==='manage'){
+    manageTab.classList.add('text-blue-600','border-blue-600');
+    manageTab.classList.remove('text-black','border-transparent');
+
+    levelsTab.classList.add('text-black','border-transparent');
+    levelsTab.classList.remove('text-blue-600','border-blue-600');
+  } else {
+    levelsTab.classList.add('text-blue-600','border-blue-600');
+    levelsTab.classList.remove('text-black','border-transparent');
+
+    manageTab.classList.add('text-black','border-transparent');
+    manageTab.classList.remove('text-blue-600','border-blue-600');
+  }
+
+  if(tab==='levels'){ renderInventoryList(); renderLowInventory(); }
+}
+</script>
+
+    <!-- Manage Tab -->
+    <div id="manage">
+      <label class="block mb-1 text-sm sm:text-base">શ્રેણી પસંદ કરો</label>
+      <select id="categorySelect" class="border p-2 mb-2 w-full text-sm sm:text-base"></select>
+
+      <label class="block mb-1 text-sm sm:text-base">વસ્તુ પસંદ કરો</label>
+      <select id="itemSelect" class="border p-2 mb-2 w-full text-sm sm:text-base" disabled></select>
+
+      <label class="block mb-1 text-sm sm:text-base">જથ્થો (ઉમેરો/કપાત)</label>
+      <input id="quantityInput" type="number" min="1" placeholder="જથ્થો" class="border p-2 mb-2 w-full text-sm sm:text-base">
+
+      <div class="flex gap-2">
+        <button onclick="changeQty('add')" class="bg-green-500 text-white p-2 rounded flex-1 text-sm sm:text-base hover:bg-green-600">ઉમેરો</button>
+        <button onclick="changeQty('deduct')" class="bg-red-500 text-white p-2 rounded flex-1 text-sm sm:text-base hover:bg-red-600">કપાત કરો</button>
+      </div>
+      <p id="managementMessage" class="text-green-600 mt-2 text-sm sm:text-base"></p>
+    </div>
+
+    <!-- Levels Tab -->
+    <div id="levels" class="hidden">
+      <input id="searchItem" type="text" placeholder="વસ્તુનું નામ શોધો" class="border p-2 mb-2 w-full text-sm sm:text-base" oninput="renderInventoryList(); renderLowInventory();">
+      <select id="filterCategory" class="border p-2 mb-2 w-full text-sm sm:text-base"></select>
+      <ul id="inventoryList" class="list-disc pl-5 mb-4 text-sm sm:text-base"></ul>
+      <h3 class="font-semibold text-sm sm:text-base">નીચા ઇન્વેન્ટરી (≤ 5)</h3>
+      <ul id="lowInventoryList" class="list-disc pl-5 text-sm sm:text-base"></ul>
+    </div>
+
+    <p id="status" class="text-xs sm:text-sm text-gray-500 mt-4">સ્ટેટસ: તૈયાર</p>
+  </div>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxrC3YNiWkztDoT4GlsFdCLa-i1OPpRb96Xyt6S4rV_AGJHCqiICUX1Pjr2PXAT70Wn/exec';
+    const LOW_THRESHOLD = 5;
+    let categories = [], items = [], inventory = [];
+
+    function setStatus(txt, ok=true){
+      const el = document.getElementById('status');
+      el.textContent = 'સ્ટેટસ: '+txt;
+      el.className = ok?'text-sm text-green-600 mt-4':'text-sm text-red-600 mt-4';
+    }
+
+    function showTab(tab){
+      document.getElementById('manage').classList.toggle('hidden', tab!=='manage');
+      document.getElementById('levels').classList.toggle('hidden', tab!=='levels');
+      document.getElementById('manageTab').classList.toggle('text-blue-600', tab==='manage');
+      document.getElementById('manageTab').classList.toggle('border-blue-600', tab==='manage');
+      document.getElementById('levelsTab').classList.toggle('text-blue-600', tab==='levels');
+      document.getElementById('levelsTab').classList.toggle('border-blue-600', tab==='levels');
+      if(tab==='levels'){ renderInventoryList(); renderLowInventory(); }
+    }
+
+    async function loadAll(){
+      try{
+        setStatus('લોડ થઈ રહ્યું છે...');
+        const res = await fetch(API_URL+'?action=getCategoriesItems');
+        const ci = await res.json();
+        categories = ci.categories;
+        items = ci.items;
+
+        const invRes = await fetch(API_URL+'?action=getInventory');
+        inventory = await invRes.json();
+
+        populateSelections();
+        populateFilterCategories();
+        renderInventoryList();
+        renderLowInventory();
+        setStatus('ડેટા લોડ થઈ ગયો.');
+      }catch(e){
+        console.error(e);
+        setStatus('લોડ નિષ્ફળ. URL અથવા પરમિશન ચેક કરો.', false);
+      }
+    }
+
+    function populateSelections(){
+      const csel = document.getElementById('categorySelect');
+      csel.innerHTML = '<option value="">શ્રેણી પસંદ કરો</option>';
+      categories.forEach(c => csel.add(new Option(c, c)));
+      csel.onchange = ()=> {
+        const sel = document.getElementById('itemSelect');
+        sel.innerHTML = '';
+        const cat = csel.value;
+        if(!cat){ sel.disabled=true; return; }
+        items.filter(i=>i.category===cat).forEach(i=>sel.add(new Option(i.name, i.name)));
+        sel.disabled=false;
+      };
+    }
+
+    function populateFilterCategories() {
+      const filter = document.getElementById('filterCategory');
+      filter.innerHTML = '<option value="">બધી શ્રેણીઓ</option>';
+      categories.forEach(c => filter.add(new Option(c, c)));
+      // Re-render lists on category change
+      filter.onchange = () => { renderInventoryList(); renderLowInventory(); };
+    }
+
+    async function changeQty(mode){
+      const cat = document.getElementById('categorySelect').value;
+      const item = document.getElementById('itemSelect').value;
+      const qty = Number(document.getElementById('quantityInput').value);
+      if(!cat || !item || !qty){ alert('સાચો egun દાખલ કરો'); return; }
+      const delta = mode==='add'?qty:-qty;
+      try{
+        setStatus('સેવ...');
+        await fetch(API_URL, { method:'POST', body:new URLSearchParams({ action:'updateQuantity', category:cat, item:item, qty: delta }) });
+        await loadAll();
+        document.getElementById('managementMessage').textContent = `${mode==='add'?'ઉમેરાયું':'કપાત થઈ'}`;
+        setStatus('સફળતાપૂર્વક સેવ કર્યું.');
+      }catch(e){ console.error(e); setStatus('સેવ નિષ્ફળ.', false); }
+    }
+
+    function renderInventoryList(){
+      const search = document.getElementById('searchItem').value.toLowerCase();
+      const filter = document.getElementById('filterCategory').value;
+      const ul = document.getElementById('inventoryList');
+      ul.innerHTML='';
+      inventory
+        .filter(r => (!filter || r.category === filter) && (!search || r.item.toLowerCase().includes(search)))
+        .sort((a,b)=>a.quantity-b.quantity)
+        .forEach(r=>{
+          const li=document.createElement('li');
+          li.textContent=`${r.category} - ${r.item}: ${r.quantity}`;
+          ul.append(li);
+        });
+    }
+
+    function renderLowInventory(){
+      const ul=document.getElementById('lowInventoryList');
+      const filter = document.getElementById('filterCategory').value;
+      ul.innerHTML='';
+      inventory
+        .filter(r => r.quantity <= LOW_THRESHOLD && (!filter || r.category === filter))
+        .sort((a,b)=>a.quantity-b.quantity)
+        .forEach(r=>{
+          const li=document.createElement('li');
+          li.textContent=`${r.category} - ${r.item}: ${r.quantity}`;
+          ul.append(li);
+        });
+    }
+
+    window.onload=loadAll;
+  </script>
+</body>
+</html>
+
+
+
+
+
